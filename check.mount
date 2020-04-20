@@ -1,0 +1,30 @@
+#!/bin/sh
+###############################################################################
+DIR="${BASH_SOURCE%/*}"
+if [ ! -d "$DIR" ]; then DIR="$PWD"; fi
+. "$DIR/config.conf"
+
+# If script is already running; abort.
+if pidof -o %PPID -x "$(basename "$0")"; then
+    echo "$(date "+%d.%m.%Y %T") INFO: $(basename "$0") already in progress. Aborting."
+    exit 3
+fi
+
+# echo "$(date "+%d.%m.%Y %T") INFO: Checking for ${localcheckfile} and ${remotecheckfile}"
+if [ -f "${remotecheckfile}" ] && [ -f "${localcheckfile}" ]; then
+    # echo "$(date "+%d.%m.%Y %T") INFO: Check successful,drive mounted"
+    exit 0
+else
+    echo "$(date "+%d.%m.%Y %T") ERROR: Drive not mounted, remount in progress"
+    /bin/bash ${bindir}/mount.remote 2>&1
+    sleep 10
+    if [ -f "${remotecheckfile}" ] && [ -f "${localcheckfile}" ]; then
+        echo "$(date "+%d.%m.%Y %T") INFO: Remount successful"
+        exit 0
+    else
+        echo "$(date "+%d.%m.%Y %T") CRITICAL: Remount failed, unmounting everything."
+        /bin/bash ${bindir}/unmount.remote 2>&1
+        sleep 30
+        exit 2
+    fi
+fi

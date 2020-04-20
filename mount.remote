@@ -1,0 +1,30 @@
+#!/bin/sh
+###############################################################################
+DIR="${BASH_SOURCE%/*}"
+if [ ! -d "$DIR" ]; then DIR="$PWD"; fi
+. "$DIR/config.conf"
+
+# Unmount drives
+/bin/bash ${bindir}/unmount.remote 2>&1
+sleep 5
+
+# Mount drives
+echo "$(date "+%d.%m.%Y %T") INFO: Mounting filesystems"
+
+# Cloud data
+echo "$(date "+%d.%m.%Y %T") INFO: Mounting ${remotemedia} with rclone"
+$rclonebin mount ${rclonemountopts} ${primaryremote}:${cloudsubdir} "${remotemedia}" &
+
+sleep 5
+
+echo "$(date "+%d.%m.%Y %T") INFO: Refreshing the local cache"
+$rclonebin rc vfs/refresh recursive=true --rc-addr localhost:5572 &
+
+# Merger-FS
+echo "$(date "+%d.%m.%Y %T") INFO: Mounting ${localmedia} and ${remotemedia} into ${mediadir} with merger-fs"
+$mergerbin "${localmedia}":"${remotemedia}" "${mediadir}" -o ${mergeropts}
+
+echo "$(date "+%d.%m.%Y %T") INFO: File systems mounted"
+
+exit
+

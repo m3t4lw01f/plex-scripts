@@ -1,0 +1,24 @@
+#!/bin/sh
+###############################################################################
+DIR="${BASH_SOURCE%/*}"
+if [ ! -d "$DIR" ]; then DIR="$PWD"; fi
+. "$DIR/config.conf"
+
+# If script is already running; abort.
+if pidof -o %PPID -x "$(basename "$0")"; then
+    echo "$(date "+%d.%m.%Y %T") INFO: $(basename "$0") already in progress. Aborting."
+    exit 3
+fi
+
+# Move local files to the cloud
+echo
+echo "$(date "+%d.%m.%Y %T") INFO: Moving contents of ${localmedia} to ${primaryremote}:${cloudsubdir}"
+$rclonebin move "${localmedia}" ${primaryremote}:${cloudsubdir} \
+	--log-file ${HOME}/logs/uploader.log -v --stats 0 \
+	--drive-chunk-size 64M --exclude-from ${bindir}/excludes \
+	--delete-empty-src-dirs --fast-list
+
+# Refresh the cache
+echo
+echo "$(date "+%d.%m.%Y %T") INFO: Refreshing the local cache"
+$rclonebin rc vfs/refresh recursive=true --rc-addr localhost:5572
