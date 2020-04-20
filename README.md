@@ -24,7 +24,7 @@ Then:
 # Steps
 * `sudo apt install merger-fs`
 * Install rclone from rclone.org
-* Create a remote in rclone that points at a folder in Google Drive. It should be a 'Drive' remote with access to either the top level of your drive. No advanced configuration is required, as our rclone mount command will configure the mount.  
+* Create a remote in rclone that points at a folder in Google Drive. It should be a 'Drive' remote with access to the top level of your drive. No advanced configuration is required, as our rclone mount command will configure the mount.  
 * Clone the repo to a folder on your computer and make sure the scripts are all executable
 * Set the primary remote to what you named the rclone remote and set the folders you wish to use in config.conf
 * Create the local folders `${HOME}/media` `${HOME}/localmedia` and `${HOME}/remotemedia` (these are the defaults in the config file)
