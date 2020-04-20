@@ -13,9 +13,9 @@ Plex must run as the same user as the scripts. On Linux you can do this from the
 `sudo systemctl edit plexmediaserver`  
 
 This is the content to be placed in the editor  
-``[Service]  
-User=myuser  
-Group=myuser``  
+`[Service]`  
+`User=myuser`  
+`Group=myuser`  
 
 Then:  
 `sudo systemctl daemon-reload`  
